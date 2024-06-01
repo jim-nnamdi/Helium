@@ -51,7 +51,7 @@ bool video_frame(const char *filename, int* vwidth, int* vheight, unsigned char*
     uint8_t * data = new uint8_t[av_frame->width * av_frame->height * 4];
     SwsContext* sws_scale_ctx = sws_getContext(av_frame->width, av_frame->height,avcodec_ctx->pix_fmt, av_frame->width, av_frame->height, AV_PIX_FMT_RGB0, SWS_BILINEAR, nullptr, nullptr, nullptr);
     if(!sws_scale_ctx)
-        v_error_msg("cannot initialize sws scale");
+        delete[] data; v_error_msg("cannot initialize sws scale");
     uint8_t* dest[4] = {data, nullptr, nullptr, nullptr};
     int dest_ls[4] = {av_frame->width * 4, 0,0,0};
     sws_scale(sws_scale_ctx, av_frame->data, av_frame->linesize, 0, av_frame->height, dest, dest_ls);
