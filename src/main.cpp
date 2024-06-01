@@ -13,20 +13,19 @@ const char* INIT_ERR = "cannot initialize glfw modules";
 const char* WIND_ERR = "cannot set up glfw windows";
 const char* FRAME_ERR = "cannot load video frame info";
 
-bool video_frame(const char *filename, int* vwidth, int* vheight, unsigned char* data);
+bool video_frame(const char *filename, int* vwidth, int* vheight, unsigned char** data);
 
 int v_error_msg(const std::string& msg) { std::cerr << msg << std::endl; return false;}
 
 int main(int argc, const char** argv){
-    GLFWwindow* window;
+    GLFWwindow *window;
     if(!glfwInit())
         v_error_msg(INIT_ERR);
     window = glfwCreateWindow(v_width, v_height, v_title, nullptr, nullptr);
     if(!window)
         v_error_msg(WIND_ERR);
-    
     int framewidth, frameheight; unsigned char* framedata;
-    if(video_frame("file_location",&framewidth, &frameheight, framedata))
+    if(!video_frame("/users/mac/desktop/welcome.mp4",&framewidth, &frameheight, &framedata))
         v_error_msg(FRAME_ERR);
     glfwMakeContextCurrent(window);
     GLuint vtexture;
@@ -39,9 +38,18 @@ int main(int argc, const char** argv){
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    glTexImage2D(GL_TEXTURE_2D, 0 , GL_RGB, v_width, v_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, framedata);
+    glTexImage2D(GL_TEXTURE_2D, 0 , GL_RGBA, framewidth, frameheight, 0, GL_RGBA, GL_UNSIGNED_BYTE, framedata);
     while(!glfwWindowShouldClose(window))
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        
+        int window_width, window_height;
+        glfwGetFramebufferSize(window, &window_width, &window_height);
+    
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+        glOrtho(0, window_width, window_height, 0, -1, 1);
+        glMatrixMode(GL_MODELVIEW);
+    
         glEnable(GL_TEXTURE_2D);
         glBegin(GL_QUADS);
             glTexCoord2d(0,0); glVertex2i(0,0);
