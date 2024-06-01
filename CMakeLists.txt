@@ -25,6 +25,7 @@ endif()
 list(APPEND SOURCES
     src/main.cpp 
     src/video_frame.cpp 
+    src/vluminance/luminance.hpp
 )
 
 add_executable(helium ${SOURCES})
